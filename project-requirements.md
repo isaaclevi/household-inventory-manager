@@ -1,0 +1,430 @@
+`# Household Inventory Management System - Project Requirements
+
+## Project Overview
+An AI-powered household inventory management system with computer vision, voice recognition, and smart recommendations to help multiple household members track items, manage shopping lists, prevent waste, and ensure food safety.
+
+---
+
+## Core Objectives
+
+1. **Track household inventory** - Know what items are currently in the house
+2. **Identify missing items** - Maintain shopping list of items needed
+3. **Monitor expiration dates** - Prevent waste and food safety issues
+4. **Multi-user collaboration** - Enable household members to communicate and coordinate
+5. **Smart recommendations** - Suggest recipes, usage priorities, and alerts
+
+---
+
+## Key Features
+
+### 1. Image Recognition & Processing
+- **Camera capture** for adding/removing items
+- **Product identification** from packaging (product name, type, brand)
+- **OCR for expiration dates** from packaging labels
+- **Produce freshness assessment**:
+  - Visual analysis: color, spots, bruising, texture
+  - Ripeness detection for fruits/vegetables
+  - Recommendations: "These bananas are ripe - eat in 2 days" vs "Still green - wait 3 days"
+  - Different assessment rules per produce type
+
+### 2. User Interface & Interacti`on
+
+#### Voice Recognition
+- **Full conversational AI interface** - natural language interactions
+- **All system interactions available via voice**:
+  - Add/remove items (with or without camera)
+  - Query inventory ("What do we have?", "What's expiring?")
+  - Update quantities
+  - Manage shopping lists
+  - Request recipes
+  - Check specific items
+- **Voice + Camera combo workflow**:
+  - Hold up item to camera
+  - System recognizes product
+  - Voice confirms action: "Adding" or "Using it"
+- **User asks clarifying questions** when needed
+- **Safety confirmations** for bulk operations (e.g., clearing all items)
+
+#### Interactive GUI Response System
+- **Structured question/answer interface** when system needs user input
+- **Response options include**:
+  - **Fixed choice buttons** - Multiple predefined options to choose from
+  - **Free text input** - Open-ended text response field
+  - **Image upload with text** - Ability to upload image along with text description
+- **Use cases**:
+  - System asks: "What type of milk is this?" → Options: "Whole", "2%", "Skim", "Other (specify)"
+  - System asks: "How many did you purchase?" → Free text number input
+  - System asks: "Can you show me the expiration date?" → Image upload with optional text
+  - Dietary preference selection during user profile setup
+  - Category disambiguation when adding items
+  - Recipe selection from multiple suggestions
+- **Benefits**:
+  - Faster interaction for common choices
+  - Guides users with structured options
+  - Reduces voice recognition errors
+  - Better for visual information (expiration dates, labels)
+  - Flexibility for edge cases via free text/image
+
+### 3. Multi-User System
+- **All household members can access and update**
+- **Real-time synchronization** across devices
+- **Activity tracking**: Who added/used what and when
+- **User profiles** with individual preferences (see User Profiles section)
+
+### 4. Item & Inventory Management
+
+#### Item Instance Tracking
+- **Item Type vs Item Instances**:
+  - Item Type: "Milk" (general product)
+  - Item Instances: Multiple containers with different expiration dates
+- **Each instance tracks**:
+  - Expiration date
+  - Purchase/add date
+  - Who added it
+  - Quantity/size
+  - Category
+
+#### Product Specificity
+- **Different products tracked separately**:
+  - Regular milk ≠ Coconut milk
+  - Organic eggs ≠ Regular eggs
+  - Whole wheat bread ≠ White bread
+  - Different brands can be tracked separately
+- **Same product, multiple instances**:
+  - 2 bottles of same milk brand with different expiration dates
+  - System tracks separately but recognizes as same product type
+
+#### Smart Usage Recommendations
+- **Proactive alerts** (general recommendations):
+  - "Your regular milk expires Jan 10 - use it soon!"
+  - "You have 3 items expiring tomorrow"
+  - Daily/periodic reminders about what needs to be used
+- **Non-intrusive during active use**:
+  - System does NOT interrupt when user is actively using an item
+  - Trusts user's choice in the moment
+  - User might have reasons for using longer-lasting item first
+
+#### Product Specificity Level (TO DECIDE)
+- How specific: Brand-level or just product type?
+- Track "2% Milk" vs "Whole Milk" as different products?
+- User preference learning over time?
+
+### 5. Categorization System
+
+#### Automatic Categorization
+- **Items automatically labeled by category**:
+  - Food categories: Dairy, Produce, Meat, Pantry/Dry Goods, Frozen, Beverages
+  - Non-food: Cleaning Supplies, Toiletries, Pet Supplies, Medicine
+- **Single unified system** with filtering/viewing by category
+- **Category-specific behavior**:
+  - Produce: freshness assessment via image
+  - Packaged goods: OCR expiration dates
+  - Cleaning supplies: may not need expiration tracking
+  - Frozen items: longer shelf life calculations
+
+#### Viewing & Organization
+- Main view shows everything
+- Filter by category
+- Dashboard showing expiration alerts per category
+- Shopping list auto-grouped by category
+
+#### Category Customization (TO DECIDE)
+- Should users be able to create custom categories?
+- Essential default categories for household?
+
+### 6. Expiration & Freshness Tracking
+
+#### Items with Expiration Dates
+- Track expiration for packaged goods
+- Alert X days before expiration
+- Prioritize "use soon" items
+- Handle multiple instances with different expiration dates
+
+#### Items without Expiration Dates
+- Produce: estimate shelf life based on freshness assessment
+- Leftovers: estimate based on item type and storage date
+- Bulk items: user-defined or system-learned shelf life
+
+#### Expired Items
+- Auto-flag expired items
+- Recommend removal or adding to shopping list
+- Track waste (items that expired unused)
+
+### 7. Shopping List Management
+
+#### Adding to Shopping List
+- Manually add items via voice/interface
+- Auto-add when items run out
+- Auto-add expired items (if user confirms)
+- Add missing recipe ingredients
+
+#### Shopping List Features
+- Filter by store/section
+- Check off items as purchased
+- Track who purchased what
+- Price tracking (optional)
+- Budget limits (optional)
+
+#### When at Store
+- Help user navigate shopping
+- Real-time recall checks before purchase
+- Verify items against shopping list
+
+### 8. Recipe Integration
+
+#### Recipe Suggestions
+- **Adaptive based on user request**:
+  - Quick suggestions using current inventory
+  - Full meal planning for the week
+  - **System asks when uncertain**: "Quick ideas or full meal plan?"
+
+#### Recipe Matching
+- Match recipes using available ingredients
+- Prioritize recipes using items expiring soon
+- Show % of ingredients available
+- Suggest with missing ingredients: "You have 80% - add eggs and parmesan?"
+
+#### Missing Ingredients
+- Auto-add to shopping list (with confirmation)
+- Substitution suggestions
+
+#### Recipe Filtering
+- **User dietary restrictions** (see User Profiles)
+- **Always ask**: "Who are you cooking for?"
+  - Individual household members
+  - "Everyone" (only recipes safe for all)
+  - Filters based on that person's/group's restrictions
+- Time to cook, difficulty
+- Dietary preferences, allergies
+
+#### Recipe Sources (TO DECIDE)
+- Online recipe APIs/databases (Spoonacular, TheMealDB)?
+- User-saved family recipes?
+- Learning system for frequently made recipes?
+
+### 9. User Profiles & Dietary Management
+
+#### Each User Profile Contains
+- **Dietary restrictions**:
+  - Allergies (nuts, dairy, shellfish, gluten, etc.)
+  - Dietary choices (vegetarian, vegan, pescatarian, kosher, halal)
+  - Health restrictions (low-sodium, diabetic-friendly, low-carb)
+  - Preferences/dislikes
+- **Calorie/nutritional goals** (see Nutrition Tracking)
+- **Health conditions** requiring specific diets
+
+#### Recipe Filtering Logic
+- Hard filters: NEVER suggest recipes with allergens
+- Soft filters: prefer certain diets but show others
+- When cooking for "Everyone": only suggest recipes satisfying ALL restrictions
+
+#### User Identification (TO DECIDE)
+- Voice recognition to identify who's speaking?
+- Manual selection: "Who's using the system?"
+- Individual logins?
+
+### 10. Nutritional Tracking & Health Data
+
+#### Online Integration
+- **Fetch nutritional data** from online databases:
+  - USDA FoodData Central
+  - Nutritionix, Edamam, or similar APIs
+- **When recognized**: calories, protein, fat, carbs, sodium, etc.
+- **Per-serving or per-package** tracking
+
+#### Recipe Nutritional Info
+- Show calories, macros, sodium for suggested recipes
+- Filter recipes by nutritional criteria: "Under 500 calories", "High protein"
+- Flag recipes violating health restrictions
+
+#### Health Metrics (TO DECIDE)
+- Automatically fetch nutrition data for every item?
+- Only lookup when user asks?
+- Track daily/weekly nutritional intake per person?
+- Most important metrics for household?
+
+### 11. Food Safety & Recall Monitoring
+
+#### Daily Recall Checks
+- **Automatic daily monitoring** of existing inventory
+- **Location-aware**: Match recalls to user's geographic area
+- **Date-specific**: Match purchase/add dates to recall date ranges
+- **Product matching**: By product name, brand, and ideally UPC/barcode
+
+#### Preventive Checks
+- **Real-time checks** when adding new items (at store)
+- Alert before purchase: "This product is currently under recall - don't buy!"
+
+#### Recall Sources
+- Government sources: FDA recalls, USDA alerts, CDC warnings
+- Contamination: Salmonella, E. coli, Listeria
+- Product recalls: contamination, mislabeling, allergens, foreign objects
+- Regional/local health department warnings
+
+#### Alert System
+- **Urgency levels**:
+  - Critical: "URGENT: Discard immediately!"
+  - Moderate: Warning with recommended action
+  - Minor: Notice/informational
+- **Alert delivery**:
+  - Immediate push notifications
+  - Flag affected items in inventory
+  - Link to official recall details
+- **Recommended actions**: Discard, return for refund, etc.
+
+#### Implementation Details (TO DECIDE)
+- **Location granularity**: Country? State? County? Zip code?
+- **Store tracking**: Record which store items came from?
+- **Historical checks**: How far back when adding old items?
+- **Alert timing**: Immediate vs morning summary?
+- **Who gets notified**: All users or admin?
+
+#### User Location (TO DECIDE)
+- What is your location (country/region)?
+- Single location or multiple (vacation home)?
+- Auto-detect or manual setting?
+
+---
+
+## Technical Considerations
+
+### Platform & Technology Stack (TO DECIDE)
+
+#### Platform Options
+- **Web application** (accessible from phones, tablets, computers)
+- **Mobile app** (iOS/Android - better camera access)
+- **Hybrid** (mobile-friendly web + native features)
+
+#### Key Technologies Needed
+- **Computer Vision & OCR**:
+  - Pre-trained models or custom training?
+  - Cloud AI services (Google Vision API, Azure, AWS) vs self-hosted
+  - Cost per image vs hardware requirements
+- **Voice Recognition & NLP**:
+  - Speech-to-text services
+  - Conversational AI (intent recognition, context management)
+  - User identification via voice?
+- **Interactive GUI Framework**:
+  - Frontend framework supporting dynamic forms and interactive elements
+  - File upload capabilities (image handling)
+  - Real-time validation and response handling
+  - Mobile-responsive design for touch interactions
+  - Component libraries for buttons, inputs, image upload widgets
+- **Image Analysis for Produce**:
+  - Freshness detection models (color analysis, defect detection)
+  - Custom training required for different produce types
+- **Backend & Database**:
+  - Real-time sync for multi-user
+  - Handle image storage
+  - API integrations
+- **APIs & Services**:
+  - Nutrition databases
+  - Recipe APIs
+  - Recall monitoring services
+  - Barcode/UPC databases
+
+#### User Technical Background (TO DECIDE)
+- Do you code? What languages?
+- Comfortable with web/mobile development?
+- Experience with AI/ML?
+- Prefer frameworks/templates or build from scratch?
+
+#### Hosting (TO DECIDE)
+- Self-hosted (home network/server)?
+- Cloud-hosted (accessible anywhere)?
+- Hybrid (local-first with cloud sync)?
+
+#### Budget Considerations
+- Cloud AI APIs cost money per API call
+- Self-hosted models need good hardware
+- Ongoing costs for hosting, APIs, storage
+
+### Development Approach (TO DECIDE)
+
+#### MVP vs Full Vision
+- Start simple (manual entry + basic tracking) then add AI?
+- Or dive into camera/voice features from start?
+- Phased rollout of features?
+
+#### Technology Preferences
+- Existing tech preferences or recommendations needed?
+- Python, JavaScript, React, Vue, Flutter, React Native?
+- Existing frameworks to leverage?
+
+---
+
+## Open Questions & Decisions Needed
+
+### High Priority
+1. **Your location/region** - Determines relevant recall sources and APIs
+2. **Technical background** - Helps determine appropriate tech stack
+3. **Platform preference** - Web app vs mobile app vs both
+4. **MVP scope** - Which features to build first vs later phases
+5. **Budget considerations** - Cloud services vs self-hosted
+
+### Medium Priority
+6. **Product specificity level** - How detailed should product matching be?
+7. **Essential categories** - What categories matter most for your household?
+8. **User identification method** - Voice recognition, login, or manual selection?
+9. **Nutrition tracking depth** - Automatic for all items or on-demand?
+10. **Recipe sources** - Which APIs/services to use?
+
+### Lower Priority
+11. **Custom categories** - Should users create their own?
+12. **Historical recall checks** - How far back to check?
+13. **Meal tracking** - Track what each person ate, or just inventory?
+14. **Store tracking** - Record purchase location per item?
+15. **Guest/visitor support** - Temporary dietary restrictions?
+
+---
+
+## Additional Features to Consider
+
+### Potentially Useful
+- Budget tracking (spending on groceries)
+- Store preferences (where to buy what)
+- Coupon/sales integration
+- Purchase history and patterns (how often you buy milk)
+- Waste tracking analytics
+- Consumption patterns per household member
+- Recurring items (auto-suggest when to rebuy)
+- Integration with online grocery delivery
+
+### Smart Home Integration
+- Fridge cameras
+- Pantry sensors (weight, inventory)
+- Smart speakers for voice
+- Automated alerts/notifications
+
+### Advanced Features
+- Meal planning calendar
+- Household task coordination (beyond inventory)
+- Learning system (preferences, patterns, habits)
+- Social features (share recipes with other households)
+
+---
+
+## Next Steps
+
+1. **Answer open questions** (especially high priority ones)
+2. **Define MVP scope** - Which features are must-haves for first version?
+3. **Choose technology stack** - Based on technical background and requirements
+4. **Design system architecture** - Database schema, API structure, integrations
+5. **Plan development phases** - Break into manageable milestones
+6. **Start building** - Begin with core features
+
+---
+
+## Notes
+
+- System philosophy: **Ask users when uncertain, don't assume**
+- Design principle: **Helpful, not presumptuous**
+- User experience: **Trust user choices in the moment, provide proactive recommendations separately**
+- Safety: **Protect against bulk deletions, contaminated products, allergens**
+- Collaboration: **Enable household coordination and communication**
+
+---
+
+**Document created**: 2026-01-04
+**Status**: Requirements gathering phase
+**Last updated**: 2026-01-10
