@@ -1,0 +1,21 @@
+section { margin-bottom: 2rem; }
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  input, select, button { padding: 0.5rem; }
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+
+  li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+.meta { color: #777; font-size: 0.85em; }

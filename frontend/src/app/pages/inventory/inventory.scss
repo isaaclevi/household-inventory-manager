@@ -1,0 +1,25 @@
+section { margin-bottom: 2rem; }
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  input, select, button { padding: 0.5rem; }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    text-align: left;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+tr.expiring td { background: #fff6e0; }
+tr.expired td { background: #ffe5e5; }
+
+.days { color: #777; font-size: 0.85em; }

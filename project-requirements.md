@@ -11,11 +11,13 @@ The following previously-open questions are now decided. Sections below marked "
 
 ### Technology Stack (DECIDED)
 - **Platform**: Mobile-friendly **web application** (works on every phone/tablet/computer via the browser; no app-store friction). Native app can come later if camera UX demands it.
-- **Frontend**: **Angular + Angular Material** (chosen over Next.js: developer already has years of Angular experience — shipping speed beats framework trendiness; SSR/SEO is irrelevant for a private household app).
-- **Database / Auth / Real-time sync**: **Supabase** (Postgres + built-in auth + real-time subscriptions) via `supabase-js`, which is framework-agnostic. This single choice covers multi-user accounts, activity tracking ("who added what"), and live sync across devices.
-- **Server-side logic**: **Supabase Edge Functions** — used in Phase 2 to call the Claude API so the API key never reaches the browser.
-- **Hosting**: static Angular build on **Vercel / Firebase Hosting / Cloudflare Pages** (app) + **Supabase** (data + functions) — free tier at household scale. Budget: ~$0/month for Phase 1.
-- **AI (vision, OCR, and conversational interface)**: **Claude API (multimodal)**, called from Supabase Edge Functions. One API call takes a product photo and returns name, brand, category, and the expiration date read off the label — this replaces the entire "Google Vision vs. Azure vs. custom model training" decision. Voice starts as browser speech-to-text (Web Speech API) feeding the same API.
+- **Frontend**: **Angular** (`frontend/`) — developer already has years of Angular experience; shipping speed beats framework trendiness. SSR/SEO is irrelevant for a private household app.
+- **Backend**: **Java 21 + Spring Boot** (`backend/`) — REST API with Spring Data JPA. Developer's primary backend stack (replaces the earlier Supabase decision; we own auth, sync, and hosting in exchange for full control).
+- **Database**: **H2 (file-based) in dev — zero setup; PostgreSQL in production** (`--spring.profiles.active=postgres`).
+- **Auth**: **Spring Security + JWT** (Phase 1, after core CRUD is working). One account per household member; `addedBy` tracking on items.
+- **Real-time sync**: **WebSocket (Spring STOMP)** — Phase 1 stretch goal; polling is acceptable until then.
+- **Hosting**: JVM host for the backend (Railway / Render / Fly.io / self-hosted) + static Angular build (Vercel / Firebase Hosting / Cloudflare Pages).
+- **AI (vision, OCR, and conversational interface)**: **Claude API (multimodal)**, called from the Spring backend so the API key never reaches the browser. One API call takes a product photo and returns name, brand, category, and the expiration date read off the label — this replaces the entire "Google Vision vs. Azure vs. custom model training" decision. Voice starts as browser speech-to-text (Web Speech API) feeding the same API.
 - **No custom ML models.** Produce-freshness scoring and voice-based user identification are deferred indefinitely (worst effort-to-value ratio in this document).
 
 ### Product Decisions (DECIDED)
@@ -464,9 +466,9 @@ The following previously-open questions are now decided. Sections below marked "
 
 1. ~~Answer open questions~~ — high-priority questions resolved in **Decisions Made (2026-07-02)**
 2. ~~Define MVP scope~~ — defined as Phase 1
-3. ~~Choose technology stack~~ — Angular + Supabase (+ Edge Functions) + Claude API
-4. **Design Phase 1 database schema** (item types, item instances, users, shopping list)
-5. **Scaffold the Angular + Supabase app and deploy an empty shell**
+3. ~~Choose technology stack~~ — Angular frontend + Java/Spring Boot backend + Claude API
+4. ~~Design Phase 1 database schema~~ — item types / item instances / shopping list entities scaffolded in `backend/`
+5. ~~Scaffold the app~~ — Angular app in `frontend/`, Spring Boot API in `backend/` (see README)
 6. **Build Phase 1 features and start using them daily**
 
 ---

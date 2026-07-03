@@ -1,0 +1,6 @@
+# Backend dev database (H2)
+backend/data/
+
+# OS noise
+.DS_Store
+Thumbs.db

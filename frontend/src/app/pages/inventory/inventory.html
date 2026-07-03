@@ -1,0 +1,48 @@
+<section class="add-item">
+  <h2>Add item</h2>
+  <form (ngSubmit)="add()">
+    <input name="name" [(ngModel)]="newName" placeholder="Item name (e.g. 2% Milk)" required />
+    <select name="category" [(ngModel)]="newCategory">
+      @for (c of categories; track c) {
+        <option [value]="c">{{ c }}</option>
+      }
+    </select>
+    <input name="quantity" type="number" min="1" [(ngModel)]="newQuantity" />
+    <input name="expiration" type="date" [(ngModel)]="newExpiration" />
+    <button type="submit">Add</button>
+  </form>
+</section>
+
+<section class="inventory">
+  <h2>In the house</h2>
+  @if (loading()) {
+    <p>Loading…</p>
+  } @else if (items().length === 0) {
+    <p>Nothing tracked yet — add your first item above.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Category</th><th>Qty</th><th>Expires</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (item of items(); track item.id) {
+          <tr [class.expired]="daysLeft(item) !== null && daysLeft(item)! < 0"
+              [class.expiring]="daysLeft(item) !== null && daysLeft(item)! >= 0 && daysLeft(item)! <= 3">
+            <td>{{ item.itemType.name }}</td>
+            <td>{{ item.itemType.category }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>
+              @if (item.expirationDate) {
+                {{ item.expirationDate | date:'mediumDate' }}
+                <span class="days">({{ daysLeft(item) }}d)</span>
+              } @else {
+                —
+              }
+            </td>
+            <td><button (click)="consume(item)">Used up</button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>
