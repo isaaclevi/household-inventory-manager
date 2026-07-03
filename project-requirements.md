@@ -15,7 +15,7 @@ The following previously-open questions are now decided. Sections below marked "
 - **Backend**: **Java 21 + Spring Boot** (`backend/`) — REST API with Spring Data JPA. Developer's primary backend stack (replaces the earlier Supabase decision; we own auth, sync, and hosting in exchange for full control).
 - **Database**: **H2 (file-based) in dev — zero setup; PostgreSQL in production** (`--spring.profiles.active=postgres`).
 - **Auth**: **Spring Security + JWT** (Phase 1, after core CRUD is working). One account per household member; `addedBy` tracking on items.
-- **Real-time sync**: **WebSocket (Spring STOMP)** — Phase 1 stretch goal; polling is acceptable until then.
+- **Multi-device data & sync**: **offline-first** — each device keeps its own local copy of shopping lists (IndexedDB in the Angular PWA); the Spring backend holds the one canonical "synced" version per list and arbitrates merges with user input. See **Multi-Device Sync** section below. (Replaces the earlier WebSocket real-time sync plan.)
 - **Hosting**: JVM host for the backend (Railway / Render / Fly.io / self-hosted) + static Angular build (Vercel / Firebase Hosting / Cloudflare Pages).
 - **AI (vision, OCR, and conversational interface)**: **Claude API (multimodal)**, called from the Spring backend so the API key never reaches the browser. One API call takes a product photo and returns name, brand, category, and the expiration date read off the label — this replaces the entire "Google Vision vs. Azure vs. custom model training" decision. Voice starts as browser speech-to-text (Web Speech API) feeding the same API.
 - **No custom ML models.** Produce-freshness scoring and voice-based user identification are deferred indefinitely (worst effort-to-value ratio in this document).
@@ -42,6 +42,11 @@ The following previously-open questions are now decided. Sections below marked "
 - Multi-user accounts with real-time sync and activity history
 - Mobile-friendly UI
 
+### Phase 1.5 — Offline-first sync (shopping lists only)
+- Angular app becomes a PWA with IndexedDB as the on-device store for shopping lists
+- Sync endpoint on the Spring backend + the user-driven merge dialog (see Multi-Device Sync section)
+- Schema groundwork lands in Phase 1: item UUIDs, `updatedAt`, `deviceId`, `deleted` tombstones
+
 ### Phase 2 — AI capture (after Phase 1 is deployed and used)
 - Photo capture → Claude API identifies product + reads expiration date → user confirms → item added
 - Voice input (browser speech-to-text → same natural-language pipeline)
@@ -52,6 +57,33 @@ The following previously-open questions are now decided. Sections below marked "
 - Nutrition lookup (USDA FoodData Central)
 - Daily recall checks (openFDA)
 - Dietary profiles & recipe filtering
+
+### Multi-Device Sync — Specification (DECIDED 2026-07-03)
+
+**Model: hub-and-spoke, two-way compare, user-arbitrated merge.** Devices never sync with each other directly. The cloud (Spring backend) stores exactly one canonical synced version of each list. On sync, a device compares only its own local list against the cloud list with the same name.
+
+**Sync flow:**
+1. Device regains a connection (or user taps "Sync") → pull the cloud list with the same list name.
+2. If local and cloud are identical → sync silently, no user interaction.
+3. If they differ → show the **merge dialog**. The user chooses one of four options:
+   1. **Keep this device's list** — cloud copy is replaced by the device list
+   2. **Keep the cloud list** — device copy is replaced by the cloud list
+   3. **Take items from both** — union; items present in both lists appear once
+   4. **Choose items myself** — both lists shown grouped as "in both" / "only on this device" / "only in cloud" with checkboxes; checked items become the merged list
+4. The merge result is saved to the cloud as the new synced version AND replaces the device's local list (device and cloud are now identical).
+5. Other devices resolve against the new cloud version at their own next sync, with the same dialog. One device, one compare, one decision at a time — no three-way conflicts.
+
+**Data requirements (must be in the Phase 1 schema):**
+- Shopping lists are first-class entities identified by name; same-name lists merge across devices
+- Every list item carries a **UUID generated on the creating device** (dedupe across devices)
+- Deletes are **tombstones** (`deleted` flag), never hard row deletion, so deletions propagate
+- Items carry `updatedAt` + `deviceId` for grouping and display in the merge dialog
+
+**UX rules:**
+- Never interrupt the user when lists are identical
+- Label sides "This device" / "Cloud", not "list 1 / list 2"
+- Custom selection pre-checks everything (union as starting point); user unchecks what they don't want
+- Scope: shopping lists only; the inventory stays server-backed (edited at home, online)
 
 ### Deferred / Dropped
 - Produce freshness assessment from photos (custom ML — dropped)
