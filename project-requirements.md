@@ -1,7 +1,60 @@
-`# Household Inventory Management System - Project Requirements
+# Household Inventory Management System - Project Requirements
 
 ## Project Overview
 An AI-powered household inventory management system with computer vision, voice recognition, and smart recommendations to help multiple household members track items, manage shopping lists, prevent waste, and ensure food safety.
+
+---
+
+## Decisions Made (2026-07-02)
+
+The following previously-open questions are now decided. Sections below marked "(TO DECIDE)" that are covered here should be read as resolved.
+
+### Technology Stack (DECIDED)
+- **Platform**: Mobile-friendly **web application** (works on every phone/tablet/computer via the browser; no app-store friction). Native app can come later if camera UX demands it.
+- **Frontend + Backend**: **Next.js + React** — one framework for UI and API routes.
+- **Database / Auth / Real-time sync**: **Supabase** (Postgres + built-in auth + real-time subscriptions). This single choice covers multi-user accounts, activity tracking ("who added what"), and live sync across devices.
+- **Hosting**: **Vercel** (app) + **Supabase** (data) — both free tier at household scale. Budget: ~$0/month for Phase 1.
+- **AI (vision, OCR, and conversational interface)**: **Claude API (multimodal)**. One API call takes a product photo and returns name, brand, category, and the expiration date read off the label — this replaces the entire "Google Vision vs. Azure vs. custom model training" decision. Voice starts as browser speech-to-text (Web Speech API) feeding the same API.
+- **No custom ML models.** Produce-freshness scoring and voice-based user identification are deferred indefinitely (worst effort-to-value ratio in this document).
+
+### Product Decisions (DECIDED)
+- **Product specificity**: Track at product-type + variant level ("2% Milk" ≠ "Whole Milk"); brand recorded as a field, not a separate product.
+- **User identification**: Simple login per household member (Supabase Auth). No voice identification.
+- **Categories**: Fixed default set (Dairy, Produce, Meat, Pantry, Frozen, Beverages, Cleaning, Toiletries, Pet, Medicine) + user-defined custom categories.
+- **Recipe source (Phase 3)**: TheMealDB (free) to start; Spoonacular if outgrown.
+- **Nutrition data (Phase 3)**: USDA FoodData Central (free), on-demand lookup only.
+- **Recalls (Phase 3)**: openFDA API (free, US). Location: single region, set manually in settings.
+
+---
+
+## Development Roadmap (Phased)
+
+**Guiding rule: ship Phase 1 before refining anything else in this document.**
+
+### Phase 1 — Core MVP (build now, ~1–2 weeks)
+- Manual item entry (name, category, quantity, expiration date)
+- Item types vs. item instances (two milk cartons, different expiration dates)
+- "Expiring soon" dashboard + expired-item flagging
+- Shared shopping list (add manually; auto-add when an item runs out)
+- Multi-user accounts with real-time sync and activity history
+- Mobile-friendly UI
+
+### Phase 2 — AI capture (after Phase 1 is deployed and used)
+- Photo capture → Claude API identifies product + reads expiration date → user confirms → item added
+- Voice input (browser speech-to-text → same natural-language pipeline)
+- Interactive clarification UI (fixed-choice buttons / free text / image upload)
+
+### Phase 3 — Integrations (only after real usage)
+- Recipe suggestions prioritizing expiring items (TheMealDB)
+- Nutrition lookup (USDA FoodData Central)
+- Daily recall checks (openFDA)
+- Dietary profiles & recipe filtering
+
+### Deferred / Dropped
+- Produce freshness assessment from photos (custom ML — dropped)
+- Voice-based speaker identification (dropped)
+- Smart-home / fridge-camera integration (deferred)
+- Budget tracking, coupons, delivery integration (deferred)
 
 ---
 
@@ -27,7 +80,7 @@ An AI-powered household inventory management system with computer vision, voice 
   - Recommendations: "These bananas are ripe - eat in 2 days" vs "Still green - wait 3 days"
   - Different assessment rules per produce type
 
-### 2. User Interface & Interacti`on
+### 2. User Interface & Interaction
 
 #### Voice Recognition
 - **Full conversational AI interface** - natural language interactions
@@ -406,12 +459,14 @@ An AI-powered household inventory management system with computer vision, voice 
 
 ## Next Steps
 
-1. **Answer open questions** (especially high priority ones)
-2. **Define MVP scope** - Which features are must-haves for first version?
-3. **Choose technology stack** - Based on technical background and requirements
-4. **Design system architecture** - Database schema, API structure, integrations
-5. **Plan development phases** - Break into manageable milestones
-6. **Start building** - Begin with core features
+> Superseded by **Development Roadmap (Phased)** at the top of this document.
+
+1. ~~Answer open questions~~ — high-priority questions resolved in **Decisions Made (2026-07-02)**
+2. ~~Define MVP scope~~ — defined as Phase 1
+3. ~~Choose technology stack~~ — Next.js + Supabase + Vercel + Claude API
+4. **Design Phase 1 database schema** (item types, item instances, users, shopping list)
+5. **Scaffold the Next.js + Supabase app and deploy an empty shell to Vercel**
+6. **Build Phase 1 features and start using them daily**
 
 ---
 
@@ -426,5 +481,5 @@ An AI-powered household inventory management system with computer vision, voice 
 ---
 
 **Document created**: 2026-01-04
-**Status**: Requirements gathering phase
-**Last updated**: 2026-01-10
+**Status**: Decisions made — ready to build Phase 1
+**Last updated**: 2026-07-02
