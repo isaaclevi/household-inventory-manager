@@ -11,10 +11,11 @@ The following previously-open questions are now decided. Sections below marked "
 
 ### Technology Stack (DECIDED)
 - **Platform**: Mobile-friendly **web application** (works on every phone/tablet/computer via the browser; no app-store friction). Native app can come later if camera UX demands it.
-- **Frontend + Backend**: **Next.js + React** — one framework for UI and API routes.
-- **Database / Auth / Real-time sync**: **Supabase** (Postgres + built-in auth + real-time subscriptions). This single choice covers multi-user accounts, activity tracking ("who added what"), and live sync across devices.
-- **Hosting**: **Vercel** (app) + **Supabase** (data) — both free tier at household scale. Budget: ~$0/month for Phase 1.
-- **AI (vision, OCR, and conversational interface)**: **Claude API (multimodal)**. One API call takes a product photo and returns name, brand, category, and the expiration date read off the label — this replaces the entire "Google Vision vs. Azure vs. custom model training" decision. Voice starts as browser speech-to-text (Web Speech API) feeding the same API.
+- **Frontend**: **Angular + Angular Material** (chosen over Next.js: developer already has years of Angular experience — shipping speed beats framework trendiness; SSR/SEO is irrelevant for a private household app).
+- **Database / Auth / Real-time sync**: **Supabase** (Postgres + built-in auth + real-time subscriptions) via `supabase-js`, which is framework-agnostic. This single choice covers multi-user accounts, activity tracking ("who added what"), and live sync across devices.
+- **Server-side logic**: **Supabase Edge Functions** — used in Phase 2 to call the Claude API so the API key never reaches the browser.
+- **Hosting**: static Angular build on **Vercel / Firebase Hosting / Cloudflare Pages** (app) + **Supabase** (data + functions) — free tier at household scale. Budget: ~$0/month for Phase 1.
+- **AI (vision, OCR, and conversational interface)**: **Claude API (multimodal)**, called from Supabase Edge Functions. One API call takes a product photo and returns name, brand, category, and the expiration date read off the label — this replaces the entire "Google Vision vs. Azure vs. custom model training" decision. Voice starts as browser speech-to-text (Web Speech API) feeding the same API.
 - **No custom ML models.** Produce-freshness scoring and voice-based user identification are deferred indefinitely (worst effort-to-value ratio in this document).
 
 ### Product Decisions (DECIDED)
@@ -463,9 +464,9 @@ The following previously-open questions are now decided. Sections below marked "
 
 1. ~~Answer open questions~~ — high-priority questions resolved in **Decisions Made (2026-07-02)**
 2. ~~Define MVP scope~~ — defined as Phase 1
-3. ~~Choose technology stack~~ — Next.js + Supabase + Vercel + Claude API
+3. ~~Choose technology stack~~ — Angular + Supabase (+ Edge Functions) + Claude API
 4. **Design Phase 1 database schema** (item types, item instances, users, shopping list)
-5. **Scaffold the Next.js + Supabase app and deploy an empty shell to Vercel**
+5. **Scaffold the Angular + Supabase app and deploy an empty shell**
 6. **Build Phase 1 features and start using them daily**
 
 ---
