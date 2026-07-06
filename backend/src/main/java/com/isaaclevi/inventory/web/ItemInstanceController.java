@@ -35,8 +35,9 @@ public class ItemInstanceController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemInstance create(@Valid @RequestBody ItemInstance instance) {
+    public ItemInstance create(@Valid @RequestBody ItemInstance instance, java.security.Principal principal) {
         instance.setId(null);
+        instance.setAddedBy(principal.getName());
         return repository.save(instance);
     }
 
