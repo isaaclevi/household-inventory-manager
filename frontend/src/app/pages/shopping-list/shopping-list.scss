@@ -1,11 +1,47 @@
 section { margin-bottom: 2rem; }
 
+.lists {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+
+  > button {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+
+    &.selected {
+      border-color: #333;
+      font-weight: bold;
+    }
+
+    .owner {
+      display: block;
+      font-size: 0.75em;
+      color: #777;
+      font-weight: normal;
+    }
+  }
+
+  .new-list {
+    display: flex;
+    gap: 0.5rem;
+
+    input, button { padding: 0.5rem; }
+  }
+}
+
 form {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  align-items: center;
 
   input, select, button { padding: 0.5rem; }
+  input[type="checkbox"] { padding: 0; }
 }
 
 ul {
@@ -13,9 +49,23 @@ ul {
   padding: 0;
 
   li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 0.5rem 0;
     border-bottom: 1px solid #ddd;
+
+    &.purchased label { text-decoration: line-through; color: #999; }
   }
 }
 
 .meta { color: #777; font-size: 0.85em; }
+.error { color: #b00020; }
+
+.remove {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}

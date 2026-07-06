@@ -1,0 +1,29 @@
+.login-card {
+  max-width: 340px;
+  margin: 4rem auto;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+
+  h2 { margin-top: 0; }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    input, button { padding: 0.6rem; }
+  }
+
+  .error { color: #b00020; margin: 0; font-size: 0.9em; }
+
+  .link {
+    margin-top: 1rem;
+    background: none;
+    border: none;
+    color: #185fa5;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
+}

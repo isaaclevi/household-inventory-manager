@@ -16,14 +16,39 @@ export interface ItemInstance {
   consumed?: boolean;
 }
 
+export interface ShoppingList {
+  id: number;
+  name: string;
+  owner: { username: string; displayName?: string };
+  createdAt?: string;
+}
+
 export interface ShoppingListItem {
-  id?: number;
+  id?: string; // UUID, device-generated during offline sync (Phase 1.5)
   name: string;
   category?: string;
   quantity: number;
   purchased?: boolean;
-  createdAt?: string;
+  deleted?: boolean;
   addedBy?: string;
+  deviceId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface MyPermissions {
+  owner: boolean;
+  canAdd: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+}
+
+export interface MemberPermission {
+  username: string;
+  displayName?: string;
+  canAdd: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 export const DEFAULT_CATEGORIES = [

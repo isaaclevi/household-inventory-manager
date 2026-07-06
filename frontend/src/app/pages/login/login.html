@@ -1,0 +1,25 @@
+<div class="login-card">
+  <h2>{{ mode() === 'login' ? 'Sign in' : 'Create account' }}</h2>
+
+  <form (ngSubmit)="submit()">
+    <input name="username" [(ngModel)]="username" placeholder="Username" autocomplete="username" required />
+    @if (mode() === 'register') {
+      <input name="displayName" [(ngModel)]="displayName" placeholder="Display name (optional)" />
+    }
+    <input name="password" type="password" [(ngModel)]="password"
+           placeholder="Password{{ mode() === 'register' ? ' (8+ characters)' : '' }}"
+           autocomplete="current-password" required />
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <button type="submit" [disabled]="busy()">
+      {{ mode() === 'login' ? 'Sign in' : 'Register' }}
+    </button>
+  </form>
+
+  <button class="link" type="button" (click)="toggleMode()">
+    {{ mode() === 'login' ? 'New here? Create an account' : 'Already have an account? Sign in' }}
+  </button>
+</div>

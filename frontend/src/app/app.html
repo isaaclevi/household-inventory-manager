@@ -1,9 +1,15 @@
 <header>
   <h1>Household Inventory</h1>
-  <nav>
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inventory</a>
-    <a routerLink="/shopping-list" routerLinkActive="active">Shopping list</a>
-  </nav>
+  @if (auth.isLoggedIn()) {
+    <nav>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inventory</a>
+      <a routerLink="/shopping-list" routerLinkActive="active">Shopping lists</a>
+    </nav>
+    <div class="user">
+      {{ auth.user()?.displayName || auth.user()?.username }}
+      <button (click)="auth.logout()">Sign out</button>
+    </div>
+  }
 </header>
 
 <main>

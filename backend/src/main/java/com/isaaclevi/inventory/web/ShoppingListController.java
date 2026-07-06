@@ -26,6 +26,8 @@ public class ShoppingListController {
     public record PermissionView(String username, String displayName,
                                  boolean canAdd, boolean canEdit, boolean canDelete) {}
 
+    public record MyPermissions(boolean owner, boolean canAdd, boolean canEdit, boolean canDelete) {}
+
     private final ShoppingListRepository lists;
     private final ShoppingListItemRepository items;
     private final ListPermissionRepository permissions;
@@ -71,6 +73,16 @@ public class ShoppingListController {
         items.deleteAll(items.findByListId(listId));
         permissions.deleteAll(permissions.findByListId(listId));
         lists.delete(list);
+    }
+
+    /** What the calling user may do on this list — drives which buttons the UI shows. */
+    @GetMapping("/{listId}/my-permissions")
+    public MyPermissions myPermissions(@PathVariable Long listId, Principal principal) {
+        ShoppingList list = getList(listId);
+        AppUser user = access.currentUser(principal.getName());
+        access.require(access.canView(list, user), "view");
+        return new MyPermissions(access.isOwner(list, user),
+                access.canAdd(list, user), access.canEdit(list, user), access.canDelete(list, user));
     }
 
     // --- Permissions (owner only) ---

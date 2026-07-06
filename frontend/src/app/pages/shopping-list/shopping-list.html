@@ -1,34 +1,91 @@
-<section class="add-item">
-  <h2>Add to shopping list</h2>
-  <form (ngSubmit)="add()">
-    <input name="name" [(ngModel)]="newName" placeholder="What do you need?" required />
-    <select name="category" [(ngModel)]="newCategory">
-      @for (c of categories; track c) {
-        <option [value]="c">{{ c }}</option>
-      }
-    </select>
-    <input name="quantity" type="number" min="1" [(ngModel)]="newQuantity" />
-    <button type="submit">Add</button>
-  </form>
-</section>
-
-<section class="list">
-  <h2>To buy</h2>
-  @if (loading()) {
-    <p>Loading…</p>
-  } @else if (items().length === 0) {
-    <p>Shopping list is empty.</p>
-  } @else {
-    <ul>
-      @for (item of items(); track item.id) {
-        <li>
-          <label>
-            <input type="checkbox" (change)="purchase(item)" />
-            {{ item.name }}
-            <span class="meta">× {{ item.quantity }} · {{ item.category }}</span>
-          </label>
-        </li>
-      }
-    </ul>
+<section class="lists-bar">
+  <h2>Your lists</h2>
+  <div class="lists">
+    @for (list of lists(); track list.id) {
+      <button [class.selected]="list.id === selectedId()" (click)="select(list.id)">
+        {{ list.name }}
+        <span class="owner">{{ list.owner.displayName || list.owner.username }}</span>
+      </button>
+    }
+    <form class="new-list" (ngSubmit)="createList()">
+      <input name="newList" [(ngModel)]="newListName" placeholder="New list name" />
+      <button type="submit">Create</button>
+    </form>
+  </div>
+  @if (!loading() && lists().length === 0) {
+    <p>No lists yet — create your first one above. You own the lists you create and can share them with your household.</p>
   }
 </section>
+
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+}
+
+@if (selectedId() !== null) {
+  @if (perms()?.canAdd) {
+    <section class="add-item">
+      <h2>Add to list</h2>
+      <form (ngSubmit)="addItem()">
+        <input name="name" [(ngModel)]="newName" placeholder="What do you need?" required />
+        <select name="category" [(ngModel)]="newCategory">
+          @for (c of categories; track c) {
+            <option [value]="c">{{ c }}</option>
+          }
+        </select>
+        <input name="quantity" type="number" min="1" [(ngModel)]="newQuantity" />
+        <button type="submit">Add</button>
+      </form>
+    </section>
+  }
+
+  <section class="list">
+    <h2>To buy</h2>
+    @if (items().length === 0) {
+      <p>This list is empty.</p>
+    } @else {
+      <ul>
+        @for (item of items(); track item.id) {
+          <li [class.purchased]="item.purchased">
+            <label>
+              <input type="checkbox" [checked]="item.purchased"
+                     [disabled]="!perms()?.canEdit" (change)="purchase(item)" />
+              {{ item.name }}
+              <span class="meta">× {{ item.quantity }} · {{ item.category }} · {{ item.addedBy }}</span>
+            </label>
+            @if (perms()?.canDelete) {
+              <button class="remove" (click)="remove(item)">Remove</button>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  @if (perms()?.owner) {
+    <section class="share">
+      <h2>Share this list</h2>
+      <form (ngSubmit)="grant()">
+        <input name="shareUser" [(ngModel)]="shareUsername" placeholder="Username" />
+        <label><input name="shareAdd" type="checkbox" [(ngModel)]="shareAdd" /> add</label>
+        <label><input name="shareEdit" type="checkbox" [(ngModel)]="shareEdit" /> edit</label>
+        <label><input name="shareDelete" type="checkbox" [(ngModel)]="shareDelete" /> delete</label>
+        <button type="submit">Share</button>
+      </form>
+      @if (members().length > 0) {
+        <ul class="members">
+          @for (member of members(); track member.username) {
+            <li>
+              {{ member.displayName || member.username }}
+              <span class="meta">
+                {{ member.canAdd ? 'add' : '' }} {{ member.canEdit ? 'edit' : '' }} {{ member.canDelete ? 'delete' : '' }}
+              </span>
+              <button class="remove" (click)="revoke(member)">Revoke</button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="meta">Not shared with anyone yet.</p>
+      }
+    </section>
+  }
+}
