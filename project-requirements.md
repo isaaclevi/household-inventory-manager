@@ -43,9 +43,11 @@ The following previously-open questions are now decided. Sections below marked "
 - Mobile-friendly UI
 
 ### Phase 1.5 — Offline-first sync (shopping lists only)
+- Requires Phase 1 auth (Spring Security + JWT) — permissions need identity
 - Angular app becomes a PWA with IndexedDB as the on-device store for shopping lists
-- Sync endpoint on the Spring backend + the user-driven merge dialog (see Multi-Device Sync section)
-- Schema groundwork lands in Phase 1: item UUIDs, `updatedAt`, `deviceId`, `deleted` tombstones
+- List ownership + permission management UI (owner grants add/edit/delete per member)
+- Sync endpoint on the Spring backend with server-side permission enforcement + the user-driven merge dialog (see Multi-Device Sync section)
+- Schema groundwork lands in Phase 1: list owner, ListPermission, item UUIDs, `updatedAt`, `deviceId`, `deleted` tombstones
 
 ### Phase 2 — AI capture (after Phase 1 is deployed and used)
 - Photo capture → Claude API identifies product + reads expiration date → user confirms → item added
@@ -73,8 +75,17 @@ The following previously-open questions are now decided. Sections below marked "
 4. The merge result is saved to the cloud as the new synced version AND replaces the device's local list (device and cloud are now identical).
 5. Other devices resolve against the new cloud version at their own next sync, with the same dialog. One device, one compare, one decision at a time — no three-way conflicts.
 
+**Ownership & permissions (added 2026-07-06):**
+- The user who **creates a list is its owner**. The owner grants each other user any combination of item permissions on that list: **add**, **edit**, **delete** (membership implies view). The owner has all permissions, manages grants, and can rename or delete the list.
+- **Membership gates the merge**: a device may sync/merge a list only if its signed-in user has permission on that cloud list. A same-name local list belonging to a non-member is NOT merged — it stays local until the owner grants access.
+- **Permissions filter the merge dialog**: a merge is a batch of adds/edits/deletes, so only options the user's permissions allow are offered (e.g. add-only → "keep the cloud list + add my new items"; full add+edit+delete → all four options).
+- **Server-side enforcement**: the sync endpoint validates every change in a pushed merge against the user's permissions and rejects disallowed ones. Hiding options in the dialog is UX, not security.
+- Dependency: permissions require identity → **Spring Security + JWT auth must ship before sync** (Phase 1, before Phase 1.5).
+
 **Data requirements (must be in the Phase 1 schema):**
-- Shopping lists are first-class entities identified by name; same-name lists merge across devices
+- Shopping lists are first-class entities identified by name; same-name lists merge across devices (members only)
+- Lists carry an `owner` (the creating user)
+- **ListPermission** entity: (list, user, canAdd, canEdit, canDelete, grantedAt) — one row per member per list
 - Every list item carries a **UUID generated on the creating device** (dedupe across devices)
 - Deletes are **tombstones** (`deleted` flag), never hard row deletion, so deletions propagate
 - Items carry `updatedAt` + `deviceId` for grouping and display in the merge dialog
